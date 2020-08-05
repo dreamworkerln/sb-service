@@ -1,40 +1,47 @@
 package com.example.service.controller;
 
+import com.example.service.dto.CustomerDto;
+import com.example.service.entities.Customer;
+import com.example.service.entities.Order;
+import com.example.service.converter.CustomerConverter;
+import com.example.service.converter.OrderConverter;
 import com.example.service.services.OrderService;
-import com.example.service.entities.OrderDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.util.List;
+
+@RestController
 @RequestMapping("/service")
 @Slf4j
 public class OrderController {
+
     private final OrderService orderService;
+    private final OrderConverter orderConverter;
+    private final CustomerConverter customerConverter;
 
-    @Autowired
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, OrderConverter orderConverter, CustomerConverter customerConverter) {
         this.orderService = orderService;
+        this.orderConverter = orderConverter;
+        this.customerConverter = customerConverter;
     }
 
 
-    @GetMapping("")
-    ResponseEntity<String> getObject(@RequestBody OrderDTO orderDTO) {
-        log.info(orderDTO.toString());
-        return new ResponseEntity<>(orderService.findOrderList(orderDTO), HttpStatus.OK);
+    @GetMapping
+    public String get(@RequestBody String json) {
+        Customer customer = customerConverter.toCustomer(json);
+        List<Order> orderList = orderService.findOrderListByCustomer(customer);
+        return orderConverter.toJson(orderList);
     }
 
-    @PutMapping("")
-    ResponseEntity<String>  putObject(@RequestBody OrderDTO orderDTO) {
-        log.info(orderDTO.toString());
-        return new ResponseEntity<>(orderService.addOrder(orderDTO),HttpStatus.OK);
-
+    // may update existing Order, createNew - implement new method
+    @PostMapping
+    public String save(@RequestBody String json) {
+        Order order = orderConverter.toOrder(json);
+        order = orderService.save(order);
+        return orderConverter.toJson(order);
     }
-
-
-
 
 }

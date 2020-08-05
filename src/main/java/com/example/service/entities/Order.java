@@ -1,45 +1,35 @@
 package com.example.service.entities;
 
+import com.example.service.exception.CustomerNotFoundException;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.mapstruct.NullValueCheckStrategy;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
-@NoArgsConstructor
+//@NoArgsConstructor
 @Data
 @Entity
 @Table(name = "orders")
 public class Order {
 
     @Id
-    @GeneratedValue
-    protected Long order_id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    protected Long id;
 
     @NotNull
-    private String customer;
+    @ManyToOne
+    @JoinColumn(name="customer_id")
+    private Customer customer;
 
     @NotNull
     private Integer cost;
 
-    public Order(String customer, Integer cost) {
+    public Order(Customer customer, Integer cost) {
         this.customer = customer;
         this.cost=cost;
     }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        final Order order = (Order) o;
-        return Objects.equals(order_id, order.order_id) &&
-                Objects.equals(customer, order.customer) &&
-                Objects.equals(cost, order.cost);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(order_id, customer, cost);
-    }
+    public Order() { }
 }

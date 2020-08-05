@@ -1,4 +1,4 @@
-package com.example.service.entities;
+package com.example.service.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
